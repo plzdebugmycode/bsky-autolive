@@ -5,7 +5,7 @@ This extension will automatically set your live status on Bluesky and link to yo
 
 ## Import Code
 1. From the Streamer.bot start page, click the "→| Import" button.
-2. Copy the code below into the "Import String" box. It should automatically populate with the following info:
+2. Copy the latest version of the code below from the [Releases](https://github.com/plzdebugmycode/bsky-autolive/releases) page into the "Import String" box. It should automatically populate with the following info:
  - Name: Bluesky Autolive
  - Author: plzdebugmycode
  - Export Version: 1.0.0
