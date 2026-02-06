@@ -1,4 +1,5 @@
 using System;
+using System.Net;
 using Newtonsoft.Json;
 using System.Globalization;
 using System.Net.Http.Headers;
@@ -57,24 +58,24 @@ public class CPHInline
 
         // Error out if autoLive_bskyIdentifier isn't set
         if(autoLive_bskyIdentifier == _defaultBskyIdString){
-            CPH.LogError("BskyAutoLive :: Set the global variable \"autoLive_bskyIdentifier\" before running this code.");
+            this.LogError("BskyAutoLive :: Set the global variable \"autoLive_bskyIdentifier\" before running this code.");
             errExit |= true;
         }
 
         // Error out if autoLive_bskyAppPassword isn't set
         if(autoLive_bskyAppPassword == _defaultBskyAppPassString){
-            CPH.LogError("BskyAutoLive :: Set the global variable \"autoLive_bskyAppPassword\" before running this code.");
+            this.LogError("BskyAutoLive :: Set the global variable \"autoLive_bskyAppPassword\" before running this code.");
             errExit |= true;
         }
 
         // Error out if autoLive_streamDefaultLength isn't set
         if(autoLive_streamDefaultLength == _defaultStreamLenString){
-            CPH.LogError("BskyAutoLive :: Set the global variable \"autoLive_streamDefaultLength\" before running this code.");
+            this.LogError("BskyAutoLive :: Set the global variable \"autoLive_streamDefaultLength\" before running this code.");
             errExit |= true;
         }
 
         if(errExit){
-            CPH.LogError("BskyAutoLive :: Exiting this action because globals weren't setup properly.");
+            this.LogError("BskyAutoLive :: Exiting this action because globals weren't setup properly.");
             return false;
         }
 
@@ -101,15 +102,15 @@ public class CPHInline
             authResponse = _httpClient.PostAsync(getSessionUri, postContent).GetAwaiter().GetResult();
         }
         catch(InvalidOperationException e){
-            CPH.LogError("BskyAutoLive :: There is an issue with the URI formation. It is targeting [" + _sessionEndpoint + "]. Contact @plzdebugmycode.");
+            this.LogError("BskyAutoLive :: There is an issue with the URI formation. It is targeting [" + _sessionEndpoint + "]. Contact @plzdebugmycode.");
             return false;
         }
         catch(HttpRequestException e){
-            CPH.LogError("BskyAutoLive :: There was an issue contacting [" + _sessionEndpoint + "]. Check connection settings and Bsky status.");
+            this.LogError("BskyAutoLive :: There was an issue contacting [" + _sessionEndpoint + "]. Check connection settings and Bsky status.");
             return false;
         }
         catch(Exception e){
-            CPH.LogError("BskyAutoLive :: An unhandled exception has ocurred. Send this log to PlzDebugMyCode.");
+            this.LogError("BskyAutoLive :: An unhandled exception has ocurred. Send this log to PlzDebugMyCode.");
             CPH.LogDebug("BskyAutoLive :: " + e.ToString());
             return false;
         }
@@ -117,13 +118,19 @@ public class CPHInline
         // Get the response data that contains the auth information. It's a async menthod, so get the Awaiter and await the result
         string sessionContentString = authResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
+        if(authResponse.StatusCode != HttpStatusCode.OK){
+            ErrorMessage errorMsg = JsonConvert.DeserializeObject<ErrorMessage>(sessionContentString);
+            this.LogError("BskyAutoLive :: " + errorMsg.error + " - " + errorMsg.message);
+            return false;
+        }
+
         // Deserialize the auth token into the ATSession object for easier manipulation
         ATSession session;
         try{
             session = JsonConvert.DeserializeObject<ATSession>(sessionContentString);
         }
         catch(JsonSerializationException){
-            CPH.LogError("BskyAutoLive :: The returned data content was not as expected. Send this log to PlzDebugMyCode.");
+            this.LogError("BskyAutoLive :: The returned data content was not as expected. Send this log to PlzDebugMyCode.");
             CPH.LogDebug("BskyAutoLive :: " + sessionContentString);
             return false;
         }
@@ -137,7 +144,7 @@ public class CPHInline
             twitchUsername = userInfo.UserName;
         }
         catch(Exception e){
-            CPH.LogError("BskyAutoLive :: You must be logged into Streamer.bot as a Twitch broadcaster to use this action.");
+            this.LogError("BskyAutoLive :: You must be logged into Streamer.bot as a Twitch broadcaster to use this action.");
             return false;
         }
 
@@ -180,34 +187,50 @@ public class CPHInline
         // Create an Uri (mostly so Streamer.bot knows to include the System.dll) 
         Uri goLiveUri = new Uri(session.didDoc.service[0].serviceEndpoint + "/xrpc/com.atproto.repo.putRecord");
 
+
         // Send the HTTP POST requst. It's a async menthod, so get the Awaiter and await the result
         HttpResponseMessage goLiveResponse;
         try{
             goLiveResponse = _httpClient.PostAsync(goLiveUri, postContent).GetAwaiter().GetResult();
         }
         catch(InvalidOperationException e){
-            CPH.LogError("BskyAutoLive :: There is an issue with the URI formation. It is targeting [" + goLiveUri.ToString() + "]. Contact @plzdebugmycode.");
+            this.LogError("BskyAutoLive :: There is an issue with the URI formation. It is targeting [" + goLiveUri.ToString() + "]. Contact @plzdebugmycode.");
             return false;
         }
         catch(HttpRequestException e){
-            CPH.LogError("BskyAutoLive :: There was an issue contacting [" + goLiveUri.ToString() + "]. Check connection settings and Bsky status.");
+            this.LogError("BskyAutoLive :: There was an issue contacting [" + goLiveUri.ToString() + "]. Check connection settings and Bsky status.");
             return false;
         }
         catch(Exception e){
-            CPH.LogError("BskyAutoLive :: An unhandled exception has ocurred. Send this log to PlzDebugMyCode.");
+            this.LogError("BskyAutoLive :: An unhandled exception has ocurred. Send this log to PlzDebugMyCode.");
             CPH.LogDebug("BskyAutoLive :: " + e.ToString());
             return false;
         }
 
-        CPH.LogDebug(goLiveResponse.Content.ReadAsStringAsync().GetAwaiter().GetResult());
+        if(goLiveResponse.StatusCode != HttpStatusCode.OK){
+            ErrorMessage errorMsg = JsonConvert.DeserializeObject<ErrorMessage>(sessionContentString);
+            this.LogError("BskyAutoLive :: " + errorMsg.error + " - " + errorMsg.message);
+            return false;
+        }
 
         return true;
+    }
+
+    private void LogError(string error_str){
+        CPH.LogError(error_str);
+        CPH.SetArgument("autolive_error", error_str);
     }
 
     
 }
 
 // Autogenerated Objects for JSON Deserialization
+public class ErrorMessage
+{
+    public string error { get; set; }
+    public string message { get; set; }
+}
+
 public class ATSession
 {
     public string did { get; set; }
