@@ -8,7 +8,7 @@ This extension will automatically set your live status on Bluesky and link to yo
 2. Copy the latest version of the code below from the [Releases](https://github.com/plzdebugmycode/bsky-autolive/releases) page into the "Import String" box. It should automatically populate with the following info:
  - Name: Bluesky Autolive
  - Author: plzdebugmycode
- - Export Version: 1.0.0
+ - Export Version: 1.0.1
  - Streamer.bot Version: 1.0.4
  - Actions: Stream Start
 3. Click the "Import" button.
@@ -25,6 +25,10 @@ This extension requires three persistent Global Variables in order to run.
 | autoLive_streamDefaultLength | The time that you want your stream to be live on Bluesky measured in minutes. Values can be 1-240. |
   
 If you Navigate to the "Stream Start" action, right-click on the "OBS Studio - Streaming Started" trigger, and click "Test Trigger", these variables will be automatically populated in your Persistent Global Variable list but you will still need to populate them.
+
+## Troubleshooting
+- If the code encounters an error, a popup will be displayed containing the encountered error. (Windows Only)
+- If further troubleshooting is required, check the logs for messages starting with "BskyAutoLive".
 
 ## Future Work
 - Add a refreshing timer so that you remain live, even after the four-hour mark.
