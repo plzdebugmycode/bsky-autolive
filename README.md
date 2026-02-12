@@ -8,9 +8,13 @@ This extension will automatically set your live status on Bluesky and link to yo
 2. Copy the latest version of the code below from the [Releases](https://github.com/plzdebugmycode/bsky-autolive/releases) page into the "Import String" box. It should automatically populate with the following info:
  - Name: Bluesky Autolive
  - Author: plzdebugmycode
- - Export Version: 1.0.1
+ - Export Version: 1.0.2
  - Streamer.bot Version: 1.0.4
- - Actions: Stream Start
+ - Actions:
+   - Stream Start
+   - Stream End
+ - Timed Actions:
+   - BskyAutolive - Refresh
 3. Click the "Import" button.
 4. Streamer.bot will warn you that "What you are importing contains custom C# code." Press the "Yes" button.
  - (A friendly reminder to never run random code from the internet that you do not trust)
@@ -29,7 +33,3 @@ If you Navigate to the "Stream Start" action, right-click on the "OBS Studio - S
 ## Troubleshooting
 - If the code encounters an error, a popup will be displayed containing the encountered error. (Windows Only)
 - If further troubleshooting is required, check the logs for messages starting with "BskyAutoLive".
-
-## Future Work
-- Add a refreshing timer so that you remain live, even after the four-hour mark.
-- Remove your live status when stream ends.
