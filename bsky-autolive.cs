@@ -212,6 +212,12 @@ public class CPHInline
             this.LogError("BskyAutoLive :: " + errorMsg.error + " - " + errorMsg.message);
             return false;
         }
+        
+        // Sets the timer interval to the default stream length var minus one
+        CPH.SetTimerInterval("feee159a-a1c0-4392-b15a-99ad97f3e248", autoLive_streamDefaultLength - 1);
+
+        // Enables the same timer
+        CPH.EnableTimerById("feee159a-a1c0-4392-b15a-99ad97f3e248");
 
         return true;
     }
